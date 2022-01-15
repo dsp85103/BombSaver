@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private void toastText(String s) {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
+
     private void configAllNeedView() {
         tvBatteryLevel = this.findViewById(R.id.tvBatteryLevel);
     }
@@ -64,31 +65,45 @@ public class MainActivity extends AppCompatActivity {
             int batteryPct = Math.round(level * 100 / (float) scale);
             tvBatteryLevel.setText(String.valueOf(batteryPct));
 
+            int highBatteryLevel = Integer.parseInt(preferences.getString("highBatteryLevel", "90"));
+            int lowBatteryLevel = Integer.parseInt(preferences.getString("lowBatteryLevel", "20"));
+
+            String notifyKindValue = preferences.getString("notifyKinds", "touchBothLevel");
+            toastText(notifyKindValue);
+            if ("touchBothLevel".equals(notifyKindValue)) {
+                if (batteryPct >= highBatteryLevel || batteryPct <= lowBatteryLevel) {
+                    doNotify(ctxt);
+                }
+            }
+
+            if ("touchLowLevel".equals(notifyKindValue) && batteryPct <= lowBatteryLevel) {
+                doNotify(ctxt);
+            }
+
+            if ("touchHighLevel".equals(notifyKindValue) && batteryPct >= highBatteryLevel) {
+                doNotify(ctxt);
+            }
+        }
+
+        private void doNotify(Context ctxt) {
+            boolean needRingtone = preferences.getBoolean("needRingtone", false);
+            boolean needVibrate = preferences.getBoolean("needVibrate", true);
+
             long[] vibrateTime =  new long[6];
             for (int i = 0; i < 5; i = i+2) {
                 vibrateTime[i] = 700;
                 vibrateTime[i+1] = 1100;
             }
-            int highBatteryLevel = Integer.parseInt(preferences.getString("highBatteryLevel", "90"));
-            int lowBatteryLevel = Integer.parseInt(preferences.getString("lowBatteryLevel", "20"));
-
-            toastText(String.valueOf(highBatteryLevel));
-            toastText(String.valueOf(lowBatteryLevel));
-            boolean needRingtone = preferences.getBoolean("needRingtone", false);
-            boolean needVibrate = preferences.getBoolean("needVibrate", true);
-
-            if (batteryPct >= highBatteryLevel || batteryPct <= lowBatteryLevel) {
-                if (needRingtone) {
-                    Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-                    if (alarmUri == null) {
-                        alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                    }
-                    Ringtone r = RingtoneManager.getRingtone(ctxt, alarmUri);
-                    r.play();
+            if (needRingtone) {
+                Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+                if (alarmUri == null) {
+                    alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 }
-                if (needVibrate) {
-                    sysVibrator.vibrate(vibrateTime, -1);
-                }
+                Ringtone r = RingtoneManager.getRingtone(ctxt, alarmUri);
+                r.play();
+            }
+            if (needVibrate) {
+                sysVibrator.vibrate(vibrateTime, -1);
             }
         }
     };
