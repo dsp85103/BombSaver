@@ -44,7 +44,9 @@ public class MainActivity extends AppCompatActivity {
         configAllNeedComponent();
 
         // register battery level receiver
-        this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        Intent batteryIntent = this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
+
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
     }
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context ctxt, Intent intent) {
+            int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
             int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
             int batteryPct = Math.round(level * 100 / (float) scale);
@@ -76,16 +79,21 @@ public class MainActivity extends AppCompatActivity {
             String notifyKindValue = preferences.getString("notifyKinds", "touchBothLevel");
 
             if ("touchBothLevel".equals(notifyKindValue)) {
-                if (batteryPct >= highBatteryLevel || batteryPct <= lowBatteryLevel) {
+                if ((status == BatteryManager.BATTERY_STATUS_CHARGING && batteryPct >= highBatteryLevel) ||
+                        ((status == BatteryManager.BATTERY_STATUS_NOT_CHARGING || status == BatteryManager.BATTERY_STATUS_DISCHARGING) && batteryPct <= lowBatteryLevel)) {
                     doNotify(ctxt);
                 }
             }
 
-            if ("touchLowLevel".equals(notifyKindValue) && batteryPct <= lowBatteryLevel) {
+            if ("touchLowLevel".equals(notifyKindValue) &&
+                    (status == BatteryManager.BATTERY_STATUS_NOT_CHARGING || status == BatteryManager.BATTERY_STATUS_DISCHARGING) &&
+                    batteryPct <= lowBatteryLevel) {
                 doNotify(ctxt);
             }
 
-            if ("touchHighLevel".equals(notifyKindValue) && batteryPct >= highBatteryLevel) {
+            if ("touchHighLevel".equals(notifyKindValue) &&
+                    status == BatteryManager.BATTERY_STATUS_CHARGING &&
+                    batteryPct >= highBatteryLevel) {
                 doNotify(ctxt);
             }
         }
