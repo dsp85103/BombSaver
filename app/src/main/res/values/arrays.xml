@@ -1,0 +1,16 @@
+<resources>
+    <!-- Notify Kind Preference -->
+    <string-array name="notify_kinds">
+        <item>到達上限通知</item>
+        <item>到達下限通知</item>
+        <item>到達上/下限通知</item>
+    </string-array>
+
+    <string-array name="notify_values">
+        <item>touchHighLevel</item>
+        <item>touchLowLevel</item>
+        <item>touchBothLevel</item>
+    </string-array>
+
+
+</resources>

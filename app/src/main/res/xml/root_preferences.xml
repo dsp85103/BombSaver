@@ -1,0 +1,44 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="電量上限下限">
+
+        <EditTextPreference
+            app:key="highBatteryLevel"
+            app:defaultValue="90"
+            app:title="電量上限%數"
+            app:summary="設定電池充電上限通知 % 數"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="lowBatteryLevel"
+            app:defaultValue="20"
+            app:title="電量下限%數"
+            app:summary="設定電池充電下限通知 % 數"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="通知設定">
+
+        <ListPreference
+            app:key="notifyKinds"
+            app:defaultValue="touchBothLevel"
+            app:entries="@array/notify_kinds"
+            app:entryValues="@array/notify_values"
+            app:title="通知"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="needRingtone"
+            app:defaultValue="false"
+            app:title="鈴聲通知" />
+
+        <SwitchPreferenceCompat
+            app:key="needVibrate"
+            app:defaultValue="true"
+            app:title="震動通知" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
