@@ -20,6 +20,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     // components
@@ -30,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvBatteryLevel;
 
     private SharedPreferences preferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             int lowBatteryLevel = Integer.parseInt(preferences.getString("lowBatteryLevel", "20"));
 
             String notifyKindValue = preferences.getString("notifyKinds", "touchBothLevel");
-            toastText(notifyKindValue);
+
             if ("touchBothLevel".equals(notifyKindValue)) {
                 if (batteryPct >= highBatteryLevel || batteryPct <= lowBatteryLevel) {
                     doNotify(ctxt);
@@ -89,11 +94,16 @@ public class MainActivity extends AppCompatActivity {
             boolean needRingtone = preferences.getBoolean("needRingtone", false);
             boolean needVibrate = preferences.getBoolean("needVibrate", true);
 
-            long[] vibrateTime =  new long[6];
-            for (int i = 0; i < 5; i = i+2) {
-                vibrateTime[i] = 700;
-                vibrateTime[i+1] = 1100;
+            long vibrateMs = Long.parseLong(preferences.getString("vibrateMs", "1100"));
+            long vibrateStopMs = Long.parseLong(preferences.getString("vibrateStopMs", "700"));
+            long vibrateCount = Long.parseLong(preferences.getString("vibrateCount", "3"));
+
+            List<Long> vibrateSequence = new ArrayList<>();
+            for (int i = 0; i < vibrateCount; i++) {
+                vibrateSequence.add(vibrateStopMs);
+                vibrateSequence.add(vibrateMs);
             }
+
             if (needRingtone) {
                 Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
                 if (alarmUri == null) {
@@ -103,8 +113,16 @@ public class MainActivity extends AppCompatActivity {
                 r.play();
             }
             if (needVibrate) {
-                sysVibrator.vibrate(vibrateTime, -1);
+                sysVibrator.vibrate(convertList(vibrateSequence), -1);
             }
+        }
+
+        private long[] convertList(List<Long> list) {
+            long[] result = new long[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                result[i] = list.get(i);
+            }
+            return result;
         }
     };
 

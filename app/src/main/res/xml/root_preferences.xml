@@ -39,6 +39,30 @@
             app:defaultValue="true"
             app:title="震動通知" />
 
+
+        <EditTextPreference
+            android:dependency="needVibrate"
+            app:key="vibrateMs"
+            app:defaultValue="1100"
+            app:title="震動毫秒數"
+            app:useSimpleSummaryProvider="true" />
+
+
+        <EditTextPreference
+            android:dependency="needVibrate"
+            app:key="vibrateStopMs"
+            app:defaultValue="700"
+            app:title="震動暫停毫秒數"
+            app:useSimpleSummaryProvider="true" />
+
+
+        <EditTextPreference
+            android:dependency="needVibrate"
+            app:key="vibrateCount"
+            app:defaultValue="3"
+            app:title="震動次數"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
